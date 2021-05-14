@@ -1,0 +1,4 @@
+Automatizar a criação de registros
+Instale o pacote desbloqueado e configure a org de desenvolvimento.
+
+Use o conteúdo do pacote incluído para criar automaticamente uma solicitação de manutenção de rotina toda vez que uma solicitação de manutenção do tipo Reparo ou Manutenção de Rotina for atualizada para o Fechado. Siga as especificações e convenções de nomeação descritas nos requisitos do negócio.

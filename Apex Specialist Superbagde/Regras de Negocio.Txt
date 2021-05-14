@@ -1,0 +1,53 @@
+Caso de uso
+Há dois tipos de pessoas neste mundo: aqueles que viajariam em um veículo recreativo (RV) e aqueles que não o fariam. A comunidade de trailers está aumentando exponencialmente em todo o mundo. Nos últimos anos, a HowWeRoll Rentals, a maior empresa de aluguel de trailers do mundo, aumentou sua pegada global e sua frota de campistas dez vezes. HowWeRoll oferece aos viajantes serviços de aluguel de trailers superiores e assistência à beira da estrada. O slogan deles é: "Temos um ótimo serviço, porque é assim que rolamos!" Sua frota de aluguel inclui todos os estilos de veículo campista, desde casas extra grandes e luxuosas sobre rodas até ossos nus, winnebagos retrô.
+
+Você foi contratado como o principal desenvolvedor da Salesforce para automatizar e dimensionar o alcance do HowWeRoll. Para os viajantes, nem toda viagem vai de acordo com o plano. Infelizmente, deve haver um galo na estrada em algum momento ao longo do caminho. Felizmente, howWeRoll tem um incrível esquadrão de reparos de RV que pode atender a qualquer pedido de manutenção, não importa onde você esteja. Estes reparos abordam uma variedade de dificuldades técnicas, desde um eixo quebrado até uma fossa séptica entupida.
+
+À medida que a empresa cresce, a frota de aluguel da HowWeRoll também cresce. Embora seja ótimo para os negócios, o atual processo de manutenção e serviço é desafiador para escalar. Além das solicitações de serviço para equipamentos quebrados ou com defeito, as solicitações de manutenção de rotina para veículos têm crescido exponencialmente. Sem verificações de manutenção de rotina, a frota de aluguel é suscetível a avarias evitáveis.
+
+É aí que você entra! HowWeRoll precisa que você automatize seu sistema de manutenção de rotina baseado em Salesforce. Você garantirá que qualquer coisa que possa causar danos desnecessários ao veículo, ou pior, coloque o cliente em perigo. Você também integrará o Salesforce com o sistema back-office do HowWeRoll que mantém o controle do inventário do armazém. Este sistema completamente separado precisa sincronizar regularmente com o Salesforce. A sincronização garante que a sede (HQ) do HowWeRoll saiba exatamente quanto equipamento está disponível ao fazer uma solicitação de manutenção e alerta-os quando eles precisam encomendar mais equipamentos.
+
+Objetos Padrão
+Você estará trabalhando com os seguintes objetos padrão:
+
+Solicitação de Manutenção (caso renomeado) — Solicitações de serviço para veículos quebrados, defeitos e manutenção de rotina.
+Equipamento (produto renomeado) — Peças e itens no armazém usados para corrigir ou manter RVs.
+Objetos personalizados
+Veículo — Veículos na frota de aluguel da HowWeRoll.
+Item de manutenção do equipamento — Junta-se a um registro de equipamentos com um registro de Solicitação de Manutenção, indicando o equipamento necessário para a solicitação de manutenção.
+Diagrama da Entidade
+Entity Diagram - Vehicle, Maintenance Request, Equipment Maintenance Item, Equipment
+
+Requisitos de negócios
+Esta seção representa o culminar de suas reuniões com as principais partes interessadas do HowWeRoll. É seu projeto automatizar programáticamente o lado de suporte e manutenção de seus negócios.
+
+Automatizar solicitações de manutenção
+Com o aumento exponencial da popularidade do RV em todo o mundo, o HowWeRoll está fornecendo centenas de veículos de luxo e economia em todo o mundo. Junto com esse aumento no estoque de aluguel vem um aumento inevitável na falha do equipamento. HowWeRoll tem um processo existente para lidar com essas falhas, mas eles querem que você construa uma automação para sua manutenção de rotina. Você construirá um processo programático que agenda automaticamente check-ups regulares no equipamento com base na data em que o equipamento foi instalado.
+
+Note
+anotações
+Use o artigo de ajuda para este superbadge para referenciar os nomes de API dos objetos e campos. Isso acelera seu processo de desenvolvimento não indo e voltando entre a Configuração e sua ferramenta de desenvolvimento.
+
+Quando uma solicitação de manutenção existente do tipo Reparo ou Manutenção de Rotina é fechada, crie uma nova solicitação de manutenção para um futuro check-up de rotina. Esta nova solicitação de manutenção está vinculada aos mesmos Registros de Veículos e Equipamentos da solicitação original fechada. O tipo deste novo pedido deve ser definido como Manutenção de Rotina. O Assunto não deve ser nulo e o campo Data do Relatório reflete o dia em que a solicitação foi criada. Lembre-se, todos os equipamentos têm ciclos de manutenção. Portanto, calcule as datas de vencimento da solicitação de manutenção utilizando o ciclo de manutenção definido nos registros de equipamentos relacionados. Se vários equipamentos forem utilizados na solicitação de manutenção, defina a data de vencimento aplicando o ciclo de manutenção mais curto à data de hoje.
+
+Projete este processo automatizado para trabalhar tanto para solicitações de manutenção única quanto em massa. Em massa, o sistema processa com sucesso aproximadamente 300 registros de solicitações de manutenção offline que estão programadas para importar em conjunto. Por enquanto, não se preocupe com as mudanças que ocorrem no próprio registro do equipamento.
+
+Expor também a lógica para outros usos na org. Separe o gatilho (chamado MaintenanceRequest) da lógica do aplicativo no manipulador (chamado MaintenanceRequestHelper). Essa configuração torna mais simples delegar ações e estender o aplicativo no futuro.
+
+Sincronizar o gerenciamento de estoque
+Além da manutenção do equipamento, automatize a sincronização de dados de inventário do HowWeRoll com o sistema externo no armazém de equipamentos. Embora todo o escritório do QG use o Salesforce, a equipe do armazém ainda trabalha em um sistema legado separado. Com essa integração, o inventário em Salesforce atualiza após o equipamento ser retirado do armazém para atender um veículo.
+
+Escreva uma classe que faça uma chamada REST para um sistema de armazém externo para obter uma lista de equipamentos que precisam ser atualizados. A resposta JSON da chamada retorna os registros de equipamentos que você upsert no Salesforce. Além do inventário, certifique-se de que outras possíveis mudanças no armazém levem para o Salesforce. Sua classe mapeia os seguintes campos: peça de substituição (sempre), custo, inventário atual, vida útil, ciclo de manutenção e SKU de armazém. Use o SKU do armazém como iD externo para identificar quais registros de equipamentos atualizar dentro do Salesforce.true
+
+Embora a HowWeRoll seja uma empresa internacional, os escritórios remotos seguem a liderança do cronograma de trabalho do QG. Portanto, todas as solicitações de manutenção são processadas durante o horário comercial normal do QG. Você precisa atualizar os dados do Salesforce durante o horário de folga (à 1:00 AM). Essa lógica funciona diariamente para que o inventário esteja atualizado todas as manhãs no QG.
+
+Criar testes de unidade
+Teste seu código para garantir que ele seja executado corretamente antes de implantá-lo na produção.
+
+Primeiro, teste o gatilho para garantir que funcione como esperado. Siga as melhores práticas testando tanto para casos de uso positivo (quando o gatilho precisa disparar) quanto para casos de uso negativo (quando o gatilho não deve disparar). Claro, passar em um teste não significa necessariamente que você tem tudo correto. Então adicione afirmações ao seu código para garantir que você não receba falsos positivos. Para o seu teste positivo, afirme que tudo foi criado corretamente, incluindo as relações com o veículo e equipamentos, bem como a data de vencimento. Para o seu teste negativo, afirme que nenhuma ordem de serviço foi criada.
+
+Como mencionado anteriormente, a enorme onda de pedidos de manutenção poderia potencialmente ser carregada de uma só vez. O número provavelmente será em torno de 200, mas para explicar os potenciais picos, pad sua classe para lidar com sucesso com pelo menos 300 registros. Para testar isso, inclua um caso de uso positivo para 300 solicitações de manutenção e afirme que seu teste funcionou como esperado.
+
+Quando você tiver 100% de cobertura de código no gatilho e no manipulador, escreva casos de teste para suas aulas de Callout e Apex agendadas. Você precisa ter 100% de cobertura de código para todos os Apex em sua organização.
+
+Certifique-se de que seu código funcione como esperado no contexto programado, validando que ele é executado após o Test.stopTest() sem exceção. Também afirmam que um trabalho assíncroto programado está na fila. As aulas de teste para o serviço de chamada e o teste agendado também devem ter 100% de cobertura de teste.
